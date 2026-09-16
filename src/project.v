@@ -5,26 +5,50 @@
 
 `default_nettype none
 
-module fulladder (
-    input A,
-    input B,
-    input Cin,
-    output Sum,
-    output Cout
+module tt_um_fullladder (
+    input  wire [7:0] ui_in,
+    output wire [7:0] uo_out,
+    input  wire [7:0] uio_in,
+    output wire [7:0] uio_out,
+    output wire [7:0] uio_oe,
+    input  wire       ena,
+    input  wire       clk,
+    input  wire       rst_n
 );
 
-wire x1;
-wire a1;
-wire a2;
-wire a3;
+    // Inputs
+    wire [3:0] A;
+    wire [3:0] B;
 
-xor (x1, A, B);
-xor (Sum, x1, Cin);
+    // Outputs
+    wire [3:0] Result;
+    wire Carry;
+    wire Zero;
 
-and (a1, A, B);
-and (a2, B, Cin);
-and (a3, A, Cin);
+    // Pin mapping
+    assign A = ui_in[3:0];
+    assign B = ui_in[7:4];
 
-or (Cout, a1, a2, a3);
+    // 4-bit addition
+    assign {Carry, Result} = A + B;
+
+    // Zero flag
+    assign Zero = (Result == 4'b0000);
+
+    // Output pin mapping
+    assign uo_out[0] = Result[0];
+    assign uo_out[1] = Result[1];
+    assign uo_out[2] = Result[2];
+    assign uo_out[3] = Result[3];
+    assign uo_out[4] = Carry;
+    assign uo_out[5] = Zero;
+
+    // Unused outputs
+    assign uo_out[6] = 1'b0;
+    assign uo_out[7] = 1'b0;
+
+    // Bidirectional pins unused
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
 
 endmodule
