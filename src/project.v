@@ -16,7 +16,7 @@ module tt_um_fulladder (
     input  wire       rst_n
 );
 
-    // Inputs
+    // 4-bit inputs
     wire [3:0] A;
     wire [3:0] B;
 
@@ -25,11 +25,11 @@ module tt_um_fulladder (
     wire Carry;
     wire Zero;
 
-    // Pin mapping
+    // Input pin mapping
     assign A = ui_in[3:0];
     assign B = ui_in[7:4];
 
-    // 4-bit addition
+    // 4-bit binary addition
     assign {Carry, Result} = A + B;
 
     // Zero flag
@@ -40,6 +40,7 @@ module tt_um_fulladder (
     assign uo_out[1] = Result[1];
     assign uo_out[2] = Result[2];
     assign uo_out[3] = Result[3];
+
     assign uo_out[4] = Carry;
     assign uo_out[5] = Zero;
 
@@ -52,3 +53,5 @@ module tt_um_fulladder (
     assign uio_oe  = 8'b0;
 
 endmodule
+
+`default_nettype wire
