@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module full_adder (
+module fulladder (
     input A,
     input B,
     input Cin,
