@@ -9,11 +9,35 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+This project implements a 4-bit binary adder.
+
+The 8 input pins are divided into two 4-bit numbers:
+- `ui[3:0]` = A
+- `ui[7:4]` = B
+
+The circuit adds A and B and produces:
+- `uo[3:0]` = 4-bit Result
+- `uo[4]` = Carry
+- `uo[5]` = Zero flag
+
+The addition is performed as:
+
+A + B = {Carry, Result}
+
+The remaining output pins are unused and set to 0.
 
 ## How to test
 
-Explain how to use your project
+The design is tested using Cocotb.
+
+The testbench applies different combinations of the 4-bit inputs A and B and checks:
+- Result
+- Carry
+- Zero flag
+
+All 256 possible combinations of A and B are tested.
+
+For each combination, the expected result is calculated and compared with the output of the design.
 
 ## External hardware
 
