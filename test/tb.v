@@ -28,7 +28,7 @@ module tb ();
 `endif
 
   // Instantiate the design
-  tt_um_fullladder (
+  tt_um_fullladder dut (
 
 `ifdef GL_TEST
     .VPWR(VPWR),
