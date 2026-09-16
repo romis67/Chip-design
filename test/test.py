@@ -9,7 +9,7 @@ from cocotb.triggers import Timer
 @cocotb.test()
 async def test_project(dut):
 
-    dut._log.info("Start")
+    dut._log.info("Start Full Adder Test")
 
     # Start clock
     clock = Clock(dut.clk, 10, unit="us")
@@ -29,76 +29,45 @@ async def test_project(dut):
 
     dut._log.info("Testing 4-bit adder")
 
-    # ------------------------------------------------
-    # Test 1
-    # A = 0, B = 0
-    # Result = 0, Carry = 0, Zero = 1
-    # ------------------------------------------------
+    # Test all possible combinations
+    for A in range(16):
+        for B in range(16):
 
-    dut.ui_in.value = 0b00000000
-    await Timer(1, unit="us")
+            # ui[3:0] = A
+            # ui[7:4] = B
+            dut.ui_in.value = (B << 4) | A
 
-    assert dut.uo_out.value & 0x3F == 0b100000
-    dut._log.info("Test 1 Passed")
+            # Allow combinational logic to settle
+            await Timer(1, unit="us")
 
-    # ------------------------------------------------
-    # Test 2
-    # A = 1, B = 1
-    # Result = 2, Carry = 0, Zero = 0
-    # ------------------------------------------------
+            # Expected result
+            total = A + B
 
-    dut.ui_in.value = 0b00010001
-    await Timer(1, unit="us")
+            expected_result = total & 0xF
+            expected_carry = (total >> 4) & 0x1
+            expected_zero = 1 if expected_result == 0 else 0
 
-    assert dut.uo_out.value & 0x3F == 0b000010
-    dut._log.info("Test 2 Passed")
+            # Read outputs
+            result = int(dut.uo_out.value) & 0xF
+            carry = (int(dut.uo_out.value) >> 4) & 0x1
+            zero = (int(dut.uo_out.value) >> 5) & 0x1
 
-    # ------------------------------------------------
-    # Test 3
-    # A = 3, B = 5
-    # Result = 8
-    # ------------------------------------------------
+            # Check result
+            assert result == expected_result, (
+                f"Result error: A={A}, B={B}, "
+                f"Expected={expected_result}, Got={result}"
+            )
 
-    dut.ui_in.value = 0b01010011
-    await Timer(1, unit="us")
+            # Check carry
+            assert carry == expected_carry, (
+                f"Carry error: A={A}, B={B}, "
+                f"Expected={expected_carry}, Got={carry}"
+            )
 
-    assert dut.uo_out.value & 0x3F == 0b001000
-    dut._log.info("Test 3 Passed")
+            # Check zero
+            assert zero == expected_zero, (
+                f"Zero error: A={A}, B={B}, "
+                f"Expected={expected_zero}, Got={zero}"
+            )
 
-    # ------------------------------------------------
-    # Test 4
-    # A = 7, B = 8
-    # Result = 15
-    # ------------------------------------------------
-
-    dut.ui_in.value = 0b10000111
-    await Timer(1, unit="us")
-
-    assert dut.uo_out.value & 0x3F == 0b001111
-    dut._log.info("Test 4 Passed")
-
-    # ------------------------------------------------
-    # Test 5
-    # A = 15, B = 1
-    # Result = 0, Carry = 1, Zero = 1
-    # ------------------------------------------------
-
-    dut.ui_in.value = 0b00011111
-    await Timer(1, unit="us")
-
-    assert dut.uo_out.value & 0x3F == 0b110000
-    dut._log.info("Test 5 Passed")
-
-    # ------------------------------------------------
-    # Test 6
-    # A = 15, B = 15
-    # Result = 14, Carry = 1, Zero = 0
-    # ------------------------------------------------
-
-    dut.ui_in.value = 0b11111111
-    await Timer(1, unit="us")
-
-    assert dut.uo_out.value & 0x3F == 0b011110
-    dut._log.info("Test 6 Passed")
-
-    dut._log.info("All tests passed!")
+    dut._log.info("All 256 combinations passed!")
